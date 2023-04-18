@@ -36,8 +36,8 @@ class LoginController extends AbstractController
     public function loginWithGoogle(Request $request)
     {
         $client = new Google_Client();
-        $client->setClientId('364147634847-fo6idfvun9fp6usn9i2op76cnpnnm0o5.apps.googleusercontent.com');
-        $client->setClientSecret('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');
+        $client->setClientId('328000882849-mb5o55rongrsa65c6m0vvcupqp5atbl8.apps.googleusercontent.com');
+        $client->setClientSecret('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');
         $client->setRedirectUri($this->generateUrl('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL));
         $client->addScope(Google_Service_YouTube::YOUTUBE_READONLY);
 
@@ -53,8 +53,8 @@ class LoginController extends AbstractController
     {
         
         $client = new Google_Client();
-        $client->setClientId('364147634847-fo6idfvun9fp6usn9i2op76cnpnnm0o5.apps.googleusercontent.com');
-        $client->setClientSecret('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');
+        $client->setClientId('328000882849-mb5o55rongrsa65c6m0vvcupqp5atbl8.apps.googleusercontent.com');
+        $client->setClientSecret('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');
         $client->setRedirectUri($this->generateUrl('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL));
         $client->addScope(Google_Service_YouTube::YOUTUBE_READONLY);
 
