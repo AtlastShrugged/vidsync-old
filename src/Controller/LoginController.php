@@ -35,8 +35,8 @@ class LoginController extends AbstractController
     public function loginWithGoogle(Request $request)
     {
         $client = new Google_Client();
-        $client->setClientId('749775336645-cg5qaurtrptcl9pef22cfjdrjam978ka.apps.googleusercontent.com');
-        $client->setClientSecret('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');
+        $client->setClientId('328000882849-mb5o55rongrsa65c6m0vvcupqp5atbl8.apps.googleusercontent.com');
+        $client->setClientSecret('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');
         $client->setRedirectUri($this->generateUrl('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL));
         $client->addScope(Google_Service_YouTube::YOUTUBE_READONLY);
 
@@ -51,8 +51,8 @@ class LoginController extends AbstractController
     public function loginCallback(Request $request)
     {
         $client = new Google_Client();
-        $client->setClientId('749775336645-cg5qaurtrptcl9pef22cfjdrjam978ka.apps.googleusercontent.com');
-        $client->setClientSecret('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');
+        $client->setClientId('328000882849-mb5o55rongrsa65c6m0vvcupqp5atbl8.apps.googleusercontent.com');
+        $client->setClientSecret('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');
         $client->setRedirectUri($this->generateUrl('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL));
         $client->addScope(Google_Service_YouTube::YOUTUBE_READONLY);
         $client->setAccessType('offline');
@@ -61,14 +61,7 @@ class LoginController extends AbstractController
         $code = $request->query->get('code');
         $accessToken = $client->fetchAccessTokenWithAuthCode($code);
 
-        if ($client->isAccessTokenExpired()) {
-            $refresh_token = $client->getRefreshToken();
-            $client->fetchAccessTokenWithRefreshToken($refresh_token);
-            $access_token = $client->getAccessToken();
-            $client->setAccessToken($access_token);
-            $session = $request->getSession();
-            $session->set('refresh_token', $refresh_token); // Save the refresh token to the session
-        }
+        
 
         try {
             $youtube = new Google_Service_YouTube($client);

@@ -15,7 +15,6 @@ class HomeController extends AbstractController
     {
         $session = $request->getSession();
         $accessToken = $session->get('access_token');
-        $refreshToken = $session->get('refresh_token');
         
         
         // echo $accessToken['access_token'];
@@ -25,16 +24,7 @@ class HomeController extends AbstractController
         $client->setApprovalPrompt('force');
         $client->setAccessToken($accessToken);
 
-        if ($client->isAccessTokenExpired()) {
-            if (!empty($refreshToken)) {
-                $client->fetchAccessTokenWithRefreshToken($refreshToken);
-                $accessToken = $client->getAccessToken();
-                $session->set('access_token', $accessToken);
-            } else {
-                return $this->redirectToRoute('login');
-            }
-        }
-
+        
         $youtube = new Google_Service_YouTube($client);
 
         $channelsResponse = $youtube->channels->listChannels('id,contentDetails', [
