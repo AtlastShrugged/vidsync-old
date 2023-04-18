@@ -14,15 +14,27 @@ class HomeController extends AbstractController
     public function index(Request $request)
     {
         $session = $request->getSession();
-        $access_token = $session->get('access_token');
+        $accessToken = $session->get('access_token');
+        $refreshToken = $session->get('refresh_token');
         
-        if (!$access_token) {
-            return $this->redirectToRoute('login');
-        }
+        
+        // echo $accessToken['access_token'];
 
         $client = new Google_Client();
-        $client->setAccessToken($access_token);
-    
+        $client->setAccessType('offline');
+        $client->setApprovalPrompt('force');
+        $client->setAccessToken($accessToken);
+
+        if ($client->isAccessTokenExpired()) {
+            if (!empty($refreshToken)) {
+                $client->fetchAccessTokenWithRefreshToken($refreshToken);
+                $accessToken = $client->getAccessToken();
+                $session->set('access_token', $accessToken);
+            } else {
+                return $this->redirectToRoute('login');
+            }
+        }
+
         $youtube = new Google_Service_YouTube($client);
 
         $channelsResponse = $youtube->channels->listChannels('id,contentDetails', [
@@ -79,7 +91,6 @@ class HomeController extends AbstractController
                     str_contains(strtolower($title), strtolower($keyword));
             });
         }
-
         return $this->render('home/index.html.twig', [
             'videos' => $videos,
             'keyword' => $keyword,
@@ -98,7 +109,7 @@ class HomeController extends AbstractController
         }
         $client = new Google_Client();
         $client->setAccessToken($access_token);
-        
+
 
         $youtube = new Google_Service_YouTube($client);
 
@@ -126,7 +137,7 @@ class HomeController extends AbstractController
             return $this->redirectToRoute('login');
         }
         $client = new Google_Client();
-        
+
         $client->setAccessToken($access_token);
 
         $youtube = new Google_Service_YouTube($client);
