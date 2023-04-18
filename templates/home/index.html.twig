@@ -3,16 +3,26 @@
 {% block title %}Videos
 {% endblock %}
 
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/home.css') }}" /> 
+{% endblock %}
+
 {% block body %}
+<body>
+	<button id="next-btn" class="next-btn">Next</button>
 	<form method="get" action="{{ path('home') }}" class="mb-4 search">
-		<div class="flex justify-center items-center">
-			<input id="search-input" type="text" name="keyword" class="form-input py-2 px-4 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 block w-3/2 sm:text-sm border-gray-300 rounded-md" placeholder="Search..." value="{{ keyword }}"/>
-			<select name="limit" class="ml-4 form-select py-2 px-4 border border-gray-400 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 rounded-md" id="limit-select">
+		<div class="search-container">
+			<div>
+				<input id="search-input" type="text" name="keyword"  placeholder="Search" value="{{ keyword }}"/>
+			</div>
+			<div class="select">
+			<label>Show&nbsp;</label><select name="limit" id="limit-select">
 				{% for i in 1..videos|length %}
 					<option value="{{ i }}" {{ limit == i ? 'selected' : '' }}>{{ i }}
-						per page</option>
+						</option>
 				{% endfor %}
-			</select>
+			</select><label>&nbsp;Rows</label>
+			</div>
 		</div>
 	</form>
 	
@@ -24,26 +34,39 @@
 		{% set currentPage = app.request.query.get('page', 1) %}
 		{% set start = (currentPage - 1) * limit %}
 		{% set end = start + limit %}
+		<div class="video-list">
+			<div class="video-heading">
+				<div class="video-heading-col">Video</div>
+				<div class="video-heading-col">Name</div>
+				<div class="video-heading-col">Published Date</div>
+				<div class="video-heading-col">ID</div>
+				<div class="video-heading-col">Duration</div>
+			</div>
 		{% for video in videos|slice(start, end) %}
 			{% if loop.index <= limit %}
 				<div class="video">
-					<label>
-						<input type="radio" name="selectedVideo" value="{{ video.videoId }}"/>
-						<img src="{{ video.thumbnail }}" alt="{{ video.title }}"/>
-						<h6>{{ video.title }}</h6>
-						<p>Published Date:
-							{{ video.publishedAt|date('Y-m-d') }}</p>
-						<p>ID:
-							{{ video.videoId }}</p>
-						<p>Duration:
-							{{video.duration}}</p>
-					</label>
+							<div class="video-col">
+								<input type="radio" name="selectedVideo" value="{{ video.videoId }}"/>
+								<img src="{{ video.thumbnail }}" alt="{{ video.title }}"/>
+							</div>
+							<div class="video-col">
+								<h6>{{ video.title }}</h6>
+							</div>
+							<div class="video-col">
+								<p>{{ video.publishedAt|date('Y-m-d') }}</p>
+							</div>
+							<div class="video-col">
+								<p>{{ video.videoId }}</p>
+							</div>
+							<div class="video-col">
+								<p>{{ video.duration }}</p>
+							</div>
 				</div>
 			{% endif %}
 		{% endfor %}
 		<div class="pagination">
 			{% if currentPage > 1 %}
-				<a href="{{ path('home', {'limit': limit, 'page': currentPage - 1}) }}">Prev</a>
+				<a href="{{ path('home', {'limit': limit, 'page': currentPage - 1}) }}">&#x3c;</a>
 			{% endif %}
 			{% for page in 1..totalPages %}
 				{% if page == currentPage %}
@@ -53,10 +76,9 @@
 				{% endif %}
 			{% endfor %}
 			{% if currentPage < totalPages %}
-				<a href="{{ path('home', {'limit': limit, 'page': currentPage + 1}) }}">Nxt</a>
+				<a href="{{ path('home', {'limit': limit, 'page': currentPage + 1}) }}">&#62;</a>
 			{% endif %}
 		</div>
-		<button id="next-btn">Next</button>
 		<script>
 			const nextBtn = document.getElementById('next-btn');
 nextBtn.addEventListener('click', () => {
@@ -69,5 +91,6 @@ this.form.submit();
 });
 		</script>
 	{% endif %}
+</body>
 {% endblock %}
 

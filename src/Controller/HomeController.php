@@ -72,7 +72,7 @@ class HomeController extends AbstractController
         }
 
         $keyword = $request->query->get('keyword');
-        $limit = $request->query->get('limit', 5);
+        $limit = $request->query->get('limit', 3);
 
         if ($keyword) {
             $videos = array_filter($videos, function ($video) use ($keyword) {
