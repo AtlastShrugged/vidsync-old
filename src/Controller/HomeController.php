@@ -148,9 +148,9 @@ class HomeController extends AbstractController
         $loop = $request->get('loop', 0);
         $disablekb = $request->get('disablekb', 0);
 
-        $embedCode = '<iframe width="' . $width . '" height="' . $height . '" 
+        $iframe = '<iframe width="' . $width . '" height="' . $height . '" 
         src="https://www.youtube.com/embed/' . $video['videoId'] . '?autoplay=' . $autoplay . '&disablekb=' . $disablekb . '&loop=' . $loop . '&playlist: ' . $video['videoId'] . ' " frameborder="0" allowfullscreen></iframe>';
-        $script1 = '
+        $embedCode = '
             <div id="player"></div>
         
             <script>
@@ -180,8 +180,8 @@ class HomeController extends AbstractController
 
         return $this->render('home/nextCode.html.twig', [
             'video' => $video,
-            'embedCode' => $embedCode,
-            'script1' => $script1
+            'iframe' => $iframe,
+            'embedcode' => $embedCode
 
         ]);
     }

@@ -116,8 +116,9 @@ body{
   }
   
   .next-btn:hover {
-    background-color: #0062cc;
+    background-color: #07b118;
   }
+
   .pagination {
     display: flex;
     justify-content: center;

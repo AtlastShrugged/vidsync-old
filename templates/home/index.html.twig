@@ -79,6 +79,11 @@
 				<a href="{{ path('home', {'limit': limit, 'page': currentPage + 1}) }}">&#62;</a>
 			{% endif %}
 		</div>
+		<style>
+		body {
+  font-family: Arial, sans-serif;
+}
+		</style>
 		<script>
 			const nextBtn = document.getElementById('next-btn');
 nextBtn.addEventListener('click', () => {
