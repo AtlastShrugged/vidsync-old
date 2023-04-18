@@ -43,7 +43,7 @@
 		{% endfor %}
 		<div class="pagination">
 			{% if currentPage > 1 %}
-				<a href="{{ path('home', {'limit': limit, 'page': currentPage - 1}) }}">Prev</a>
+				<a href="{{ path('home', {'limit': limit, 'page': currentPage - 1}) }}">&#8678;</a>
 			{% endif %}
 			{% for page in 1..totalPages %}
 				{% if page == currentPage %}
@@ -53,7 +53,7 @@
 				{% endif %}
 			{% endfor %}
 			{% if currentPage < totalPages %}
-				<a href="{{ path('home', {'limit': limit, 'page': currentPage + 1}) }}">Nxt</a>
+				<a href="{{ path('home', {'limit': limit, 'page': currentPage + 1}) }}">&#8680;</a>
 			{% endif %}
 		</div>
 		<button id="next-btn">Next</button>
