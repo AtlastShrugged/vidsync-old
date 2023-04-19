@@ -14,15 +14,17 @@ class HomeController extends AbstractController
     public function index(Request $request)
     {
         $session = $request->getSession();
-        $access_token = $session->get('access_token');
+        $accessToken = $session->get('access_token');
         
-        if (!$access_token) {
-            return $this->redirectToRoute('login');
-        }
+        
+        // echo $accessToken['access_token'];
 
         $client = new Google_Client();
-        $client->setAccessToken($access_token);
-    
+        $client->setAccessType('offline');
+        $client->setApprovalPrompt('force');
+        $client->setAccessToken($accessToken);
+
+        
         $youtube = new Google_Service_YouTube($client);
 
         $channelsResponse = $youtube->channels->listChannels('id,contentDetails', [
@@ -70,7 +72,7 @@ class HomeController extends AbstractController
         }
 
         $keyword = $request->query->get('keyword');
-        $limit = $request->query->get('limit', 5);
+        $limit = $request->query->get('limit', 3);
 
         if ($keyword) {
             $videos = array_filter($videos, function ($video) use ($keyword) {
@@ -79,7 +81,6 @@ class HomeController extends AbstractController
                     str_contains(strtolower($title), strtolower($keyword));
             });
         }
-
         return $this->render('home/index.html.twig', [
             'videos' => $videos,
             'keyword' => $keyword,
@@ -98,7 +99,7 @@ class HomeController extends AbstractController
         }
         $client = new Google_Client();
         $client->setAccessToken($access_token);
-        
+
 
         $youtube = new Google_Service_YouTube($client);
 
@@ -126,7 +127,7 @@ class HomeController extends AbstractController
             return $this->redirectToRoute('login');
         }
         $client = new Google_Client();
-        
+
         $client->setAccessToken($access_token);
 
         $youtube = new Google_Service_YouTube($client);
@@ -147,9 +148,9 @@ class HomeController extends AbstractController
         $loop = $request->get('loop', 0);
         $disablekb = $request->get('disablekb', 0);
 
-        $embedCode = '<iframe width="' . $width . '" height="' . $height . '" 
+        $iframe = '<iframe width="' . $width . '" height="' . $height . '" 
         src="https://www.youtube.com/embed/' . $video['videoId'] . '?autoplay=' . $autoplay . '&disablekb=' . $disablekb . '&loop=' . $loop . '&playlist: ' . $video['videoId'] . ' " frameborder="0" allowfullscreen></iframe>';
-        $script1 = '
+        $embedCode = '
             <div id="player"></div>
         
             <script>
@@ -179,8 +180,8 @@ class HomeController extends AbstractController
 
         return $this->render('home/nextCode.html.twig', [
             'video' => $video,
-            'embedCode' => $embedCode,
-            'script1' => $script1
+            'iframe' => $iframe,
+            'embedcode' => $embedCode
 
         ]);
     }

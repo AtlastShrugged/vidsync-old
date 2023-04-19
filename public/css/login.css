@@ -1,0 +1,26 @@
+body {
+    background: linear-gradient(to bottom right, #1a8fe4, #938cac);
+}
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 220px;
+    height: 50px;
+    border: 1px solid #d9dbfa;
+    background-color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.google-logo {
+    width: 35px;
+    height: 35px;
+    background: none;
+}
