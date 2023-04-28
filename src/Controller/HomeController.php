@@ -44,9 +44,8 @@ class HomeController extends AbstractController
         }
 
         if (empty($videoIds)) {
-            return $this->render('home/index.html.twig', [
+            return $this->render('home/novideo.html.twig', [
                 'videos' => [],
-                'noResults' => true,
             ]);
         }
 
