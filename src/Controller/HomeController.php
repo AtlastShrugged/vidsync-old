@@ -3,28 +3,31 @@
 namespace App\Controller;
 
 use Google_Client;
+use App\Entity\AccessToken;
 use Google\Service\YouTube as Google_Service_YouTube;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 
 class HomeController extends AbstractController
 {
     #[Route('/home', name: 'app_home')]
-    public function index(Request $request)
+    public function index(Request $request, EntityManagerInterface $entityManager)
     {
-        $session = $request->getSession();
-        $accessToken = $session->get('access_token');
-        
-        
-        // echo $accessToken['access_token'];
-
+        $accessTokenRepository = $entityManager->getRepository(AccessToken::class);
+        $accessToken = $accessTokenRepository->findOneBy([], ['id' => 'DESC']);
+    
+        if (!$accessToken) {
+            return $this->redirectToRoute('login');
+        }
+    
+        $accessTokenValue = json_decode($accessToken->getToken(), true);
+    
+        // Set the access token in the Google Client
         $client = new Google_Client();
-        $client->setAccessType('offline');
-        $client->setApprovalPrompt('force');
-        $client->setAccessToken($accessToken);
+        $client->setAccessToken($accessTokenValue);
 
-        
         $youtube = new Google_Service_YouTube($client);
 
         $channelsResponse = $youtube->channels->listChannels('id,contentDetails', [
@@ -88,16 +91,20 @@ class HomeController extends AbstractController
         ]);
     }
     #[Route('/videos/{videoId}', name: 'video_detail')]
-    public function videoDetail(Request $request, string $videoId)
+    public function videoDetail(Request $request, string $videoId, EntityManagerInterface $entityManager)
     {
-
-        $session = $request->getSession();
-        $access_token = $session->get('access_token');
-        if (!$access_token) {
+        $accessTokenRepository = $entityManager->getRepository(AccessToken::class);
+        $accessToken = $accessTokenRepository->findOneBy([], ['id' => 'DESC']);
+    
+        if (!$accessToken) {
             return $this->redirectToRoute('login');
         }
+    
+        $accessTokenValue = json_decode($accessToken->getToken(), true);
+    
+        // Set the access token in the Google Client
         $client = new Google_Client();
-        $client->setAccessToken($access_token);
+        $client->setAccessToken($accessTokenValue);
 
 
         $youtube = new Google_Service_YouTube($client);
@@ -117,17 +124,20 @@ class HomeController extends AbstractController
         ]);
     }
     #[Route('/code/{videoId}', name: 'video_code')]
-    public function videoCode(Request $request, string $videoId)
+    public function videoCode(Request $request, string $videoId, EntityManagerInterface $entityManager)
     {
-
-        $session = $request->getSession();
-        $access_token = $session->get('access_token');
-        if (!$access_token) {
+        $accessTokenRepository = $entityManager->getRepository(AccessToken::class);
+        $accessToken = $accessTokenRepository->findOneBy([], ['id' => 'DESC']);
+    
+        if (!$accessToken) {
             return $this->redirectToRoute('login');
         }
+    
+        $accessTokenValue = json_decode($accessToken->getToken(), true);
+    
+        // Set the access token in the Google Client
         $client = new Google_Client();
-
-        $client->setAccessToken($access_token);
+        $client->setAccessToken($accessTokenValue);
 
         $youtube = new Google_Service_YouTube($client);
         $videosResponse = $youtube->videos->listVideos('snippet', [

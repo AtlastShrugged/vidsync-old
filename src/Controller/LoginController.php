@@ -3,8 +3,10 @@
 namespace App\Controller;
 
 use Google_Client;
+use App\Entity\AccessToken;
 use Google\Service\YouTube as Google_Service_YouTube;
 use Google_Service_Exception;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,12 +21,12 @@ class LoginController extends AbstractController
 
     public function login(Request $request)
     {
-        $session = $request->getSession();
-        $access_token = $session->get('access_token');
+        // $session = $request->getSession();
+        // $access_token = $session->get('access_token');
 
-        if ($access_token) {
-            return $this->redirectToRoute('home');
-        }
+        // if ($access_token) {
+        //     return $this->redirectToRoute('home');
+        // }
         
         return $this->render('first_login.html.twig');
     }
@@ -49,7 +51,7 @@ class LoginController extends AbstractController
     /**
      * @Route("/login_callback", name="login_callback")
      */
-    public function loginCallback(Request $request)
+    public function loginCallback(Request $request, EntityManagerInterface $entityManager)
     {
         
         $client = new Google_Client();
@@ -79,8 +81,12 @@ class LoginController extends AbstractController
         }
         
 
-        $session = $request->getSession();
-        $session->set('access_token', $accessToken);
+            // Store the access token in the database
+        $AccessToken = new AccessToken();
+        $AccessToken->setToken(json_encode($accessToken));
+        $entityManager->persist($AccessToken);
+        $entityManager->flush();
+
 
         return $this->redirectToRoute('home');
     }
