@@ -19,15 +19,16 @@ class LoginController extends AbstractController
      * @Route("/login", name="login")
      */
 
-    public function login(Request $request)
+    public function login(EntityManagerInterface $entityManager)
     {
-        // $session = $request->getSession();
-        // $access_token = $session->get('access_token');
-
-        // if ($access_token) {
-        //     return $this->redirectToRoute('home');
-        // }
-        
+        $accessTokenRepository = $entityManager->getRepository(AccessToken::class);
+        $accessToken = $accessTokenRepository->findOneBy([], ['id' => 'DESC']);
+    
+        if ($accessToken) {
+            return $this->redirectToRoute('home');
+        }
+    
+    
         return $this->render('first_login.html.twig');
     }
 
