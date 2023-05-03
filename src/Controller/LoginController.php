@@ -35,8 +35,8 @@ class LoginController extends AbstractController
     public function loginWithGoogle(Request $request)
     {
         $client = new Google_Client();
-        $client->setClientId('328000882849-mb5o55rongrsa65c6m0vvcupqp5atbl8.apps.googleusercontent.com');
-        $client->setClientSecret('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');
+        $client->setClientId('1041883215956-c527f1l8illo7bnfdk3fjqvdthjdvill.apps.googleusercontent.com');
+        $client->setClientSecret('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');
         $client->setRedirectUri($this->generateUrl('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL));
         $client->addScope(Google_Service_YouTube::YOUTUBE_READONLY);
 
@@ -51,8 +51,8 @@ class LoginController extends AbstractController
     public function loginCallback(Request $request)
     {
         $client = new Google_Client();
-        $client->setClientId('328000882849-mb5o55rongrsa65c6m0vvcupqp5atbl8.apps.googleusercontent.com');
-        $client->setClientSecret('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');
+        $client->setClientId('1041883215956-c527f1l8illo7bnfdk3fjqvdthjdvill.apps.googleusercontent.com');
+        $client->setClientSecret('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');
         $client->setRedirectUri($this->generateUrl('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL));
         $client->addScope(Google_Service_YouTube::YOUTUBE_READONLY);
         $client->setAccessType('offline');
@@ -66,11 +66,13 @@ class LoginController extends AbstractController
         try {
             $youtube = new Google_Service_YouTube($client);
             $channels = $youtube->channels->listChannels('snippet', ['mine' => true]);
-            if (count($channels) === 0) {
+            
+            if (count($channels) === 0 || $channels[0]['statistics']['videoCount'] == 0) {
                 return $this->render('error.html.twig', [
-                    'message' => 'No channel for this account, try with another one'
+                    'message' => 'No channel or videos for this account, try with another one'
                 ]);
             }
+            
         } catch (Google_Service_Exception $e) {
             return $this->render('error.html.twig', [
                 'message' => $e->getMessage()
