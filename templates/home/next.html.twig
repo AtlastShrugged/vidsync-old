@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+{% block title %}Video Details
+{% endblock %}
+{% block body %}
+	<div class="video-container">
+		<div class="video-player">
+			<h1>{{ video.title }}</h1>
+			<iframe src="https://www.youtube.com/embed/{{ video.videoId }}" frameborder="0" allowfullscreen width="570" height="308"></iframe>
+		</div>
+
+		<div class="video-details">
+				<form action="{{ path('video_code', {'videoId': video.videoId}) }}" method="post">
+    <div class="checkbox-group">
+        <label for="checkbox1"><h3><input class="check" type="checkbox" id="checkbox1" name="autoplay" value="0" onclick="this.value=1;"> Autoplay</h3></label>
+    </div>
+    <div class="checkbox-group">
+        <label for="checkbox2"><h3><input class="check" type="checkbox" id="checkbox2" name="loop" value="0" onclick="this.value=1;"> Loop video</h3></label>
+    </div>
+    <div class="checkbox-group">
+        <label for="checkbox3"><h3><input class="check" type="checkbox" id="checkbox3" name="disablekb" value="0" onclick="this.value=1;"> Disable Keyboard Controls</h3></label>
+    </div>
+    <div>
+        <label for="textbox1"><h3><input type="text" class="textara" id="textbox1" name="textbox1"> Width of video</h3></label>
+        <label for="textbox2"><h3><input type="text" class="textara" id="textbox2" name="textbox2"> Height of video</h3></label>
+        
+    </div>
+    <button id="next-btn" class="next-btn">Next</button>
+</form>
+		</div>
+	<style>
+    body {
+  font-family: Arial, sans-serif;
+}
+	.textara {
+  width: 50px;
+  height: 20px;
+}
+
+	.next-btn {
+    display: block;
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    padding: 10px 20px;
+    background-color: #06a616;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .next-btn:hover {
+    background-color: #07b118;
+  }
+		.video-container {
+			display: flex;
+			flex-direction: row;
+		}
+
+		.video-player {
+			flex: 1;
+			padding: 0 50px;
+		}
+
+		.video-details {
+			flex: 1;
+			padding: 100px 80px;
+		}
+	</style>
+
+{% endblock %}

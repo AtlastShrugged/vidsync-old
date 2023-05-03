@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/login.css') }}" /> 
+{% endblock %}
+
+{% block body %}
+<body>
+  <div class="container">
+    <div class="login-form">
+        <a href="{{ path('login_with_google') }}" class="btn">
+        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" class="google-logo">
+        <span class="google-login-text">Login with Google</span>
+        </a>
+
+    </div>
+  </div>
+</body>
+<style>
+.google-login-text {
+    margin-left: 10px;
+    font-size: 1.2em;
+  }
+  .btn:hover{
+    background-color: #ffffff;
+}
+body {
+  font-family: Arial, sans-serif;
+}
+a{
+   text-decoration: none;
+}
+a:active {
+  color: blue;
+}
+  </style>
+{% endblock %}

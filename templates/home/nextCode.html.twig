@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+{% block title %}Video Codes
+{% endblock %}
+{% block body %}
+	<div class="video-container">
+		<div class="video-player">
+			<h1>{{ video.title }}</h1>
+			<iframe src="https://www.youtube.com/embed/{{ video.videoId }}" frameborder="0" allowfullscreen width="570" height="308"></iframe>
+		</div>
+
+		<div class="video-details">
+			<div
+				class="video-iframe">
+				{# <h4>Iframe:</h4> #}
+				Iframe:
+				<br>
+				<br>
+				{{ iframe }}
+			</div>
+			<div
+				class="video-embed">
+				{# <h4>Embed Code:</h4> #}
+				Embed Code:
+				<br>
+				<br>
+				{{ embedcode }}
+			</div>
+		</div>
+	</div>
+	<style>
+	body {
+  font-family: Arial, sans-serif;
+}
+		.video-container {
+			display: flex;
+			flex-direction: row;
+		}
+
+		.video-player {
+			flex: 1;
+			padding: 0 50px;
+		}
+
+		.video-details {
+			flex: 1;
+			padding: 75px 50px;
+		}
+
+		.video-iframe,
+		.video-embed {
+			border: 1px solid #ccc;
+			padding: 10px;
+		}
+	</style>
+{% endblock %}  
+
