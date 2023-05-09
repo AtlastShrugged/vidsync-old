@@ -23,9 +23,12 @@ home:
 
 video_detail:
     path: '/videos/{videoId}'
-    controller: App\Controller\HomeController::videoDetail
+    controller: App\Controller\VideoController::videoDetail
 
 video_code:
     path: '/code/{videoId}'
-    controller: App\Controller\HomeController::videoCode
+    controller: App\Controller\VideoIdController::videoCode
 
+signout:
+    path: /signout
+    controller: App\Controller\HomeController::signout

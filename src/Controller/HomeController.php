@@ -3,30 +3,38 @@
 namespace App\Controller;
 
 use Google_Client;
-use App\Entity\AccessToken;
 use Google\Service\YouTube as Google_Service_YouTube;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Doctrine\ORM\EntityManagerInterface;
+
 
 class HomeController extends AbstractController
 {
     #[Route('/home', name: 'app_home')]
-    public function index(Request $request, EntityManagerInterface $entityManager)
+    public function index(Request $request)
     {
-        $accessTokenRepository = $entityManager->getRepository(AccessToken::class);
-        $accessToken = $accessTokenRepository->findOneBy([], ['id' => 'DESC']);
-    
-        if (!$accessToken) {
+        $session = $request->getSession();
+        $access_token = $session->get('access_token');
+        
+        if (!$access_token) {
             return $this->redirectToRoute('login');
         }
-    
-        $accessTokenValue = json_decode($accessToken->getToken(), true);
-    
-        // Set the access token in the Google Client
+        echo $access_token["access_token"];
         $client = new Google_Client();
-        $client->setAccessToken($accessTokenValue);
+        $client->setAccessToken($access_token);
+
+        if ($client->isAccessTokenExpired()) {
+            // Get the refresh token from the session
+            $refresh_token = $session->get('refresh_token');
+
+            // Set the refresh token and fetch a new access token
+            $client->fetchAccessTokenWithRefreshToken($refresh_token);
+            $access_token = $client->getAccessToken();
+    
+            // Update the session with the new access token
+            $session->set('access_token', $access_token);
+        }
 
         $youtube = new Google_Service_YouTube($client);
 
@@ -90,108 +98,12 @@ class HomeController extends AbstractController
             'limit' => $limit,
         ]);
     }
-    #[Route('/videos/{videoId}', name: 'video_detail')]
-    public function videoDetail(Request $request, string $videoId, EntityManagerInterface $entityManager)
+    
+    public function signout(Request $request)
     {
-        $accessTokenRepository = $entityManager->getRepository(AccessToken::class);
-        $accessToken = $accessTokenRepository->findOneBy([], ['id' => 'DESC']);
+        $session = $request->getSession();
+        $session->clear();
     
-        if (!$accessToken) {
-            return $this->redirectToRoute('login');
-        }
-    
-        $accessTokenValue = json_decode($accessToken->getToken(), true);
-    
-        // Set the access token in the Google Client
-        $client = new Google_Client();
-        $client->setAccessToken($accessTokenValue);
-
-
-        $youtube = new Google_Service_YouTube($client);
-
-        $videosResponse = $youtube->videos->listVideos('snippet', [
-            'id' => $videoId,
-        ]);
-
-        $video = [
-            'title' => $videosResponse[0]->snippet->title,
-            'thumbnail' => $videosResponse[0]->snippet->thumbnails->high->url,
-            'videoId' => $videosResponse[0]->id,
-        ];
-
-        return $this->render('home/next.html.twig', [
-            'video' => $video,
-        ]);
-    }
-    #[Route('/code/{videoId}', name: 'video_code')]
-    public function videoCode(Request $request, string $videoId, EntityManagerInterface $entityManager)
-    {
-        $accessTokenRepository = $entityManager->getRepository(AccessToken::class);
-        $accessToken = $accessTokenRepository->findOneBy([], ['id' => 'DESC']);
-    
-        if (!$accessToken) {
-            return $this->redirectToRoute('login');
-        }
-    
-        $accessTokenValue = json_decode($accessToken->getToken(), true);
-    
-        // Set the access token in the Google Client
-        $client = new Google_Client();
-        $client->setAccessToken($accessTokenValue);
-
-        $youtube = new Google_Service_YouTube($client);
-        $videosResponse = $youtube->videos->listVideos('snippet', [
-            'id' => $videoId,
-        ]);
-
-        $video = [
-            'title' => $videosResponse[0]->snippet->title,
-            'thumbnail' => $videosResponse[0]->snippet->thumbnails->high->url,
-            'videoId' => $videosResponse[0]->id,
-        ];
-
-        $width = $request->get('textbox1');
-        $height = $request->get('textbox2');
-
-        $autoplay = $request->get('autoplay', 0);
-        $loop = $request->get('loop', 0);
-        $disablekb = $request->get('disablekb', 0);
-
-        $iframe = '<iframe width="' . $width . '" height="' . $height . '" 
-        src="https://www.youtube.com/embed/' . $video['videoId'] . '?autoplay=' . $autoplay . '&disablekb=' . $disablekb . '&loop=' . $loop . '&playlist: ' . $video['videoId'] . ' " frameborder="0" allowfullscreen></iframe>';
-        $embedCode = '
-            <div id="player"></div>
-        
-            <script>
-              
-              var tag = document.createElement("script");
-        
-              tag.src = "https://www.youtube.com/iframe_api";
-              var firstScriptTag = document.getElementsByTagName("script")[0];
-              firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        
-              var player;
-              function onYouTubeIframeAPIReady() {
-                player = new YT.Player("player", {
-                  height: "' . $height . '",
-                  width: "' . $width . '",
-                  videoId: "' . $video['videoId'] . '",
-                  
-                  playerVars: {
-                    disablekb: ' . $disablekb . ',
-                    autoplay: ' . $autoplay . ',
-                    loop: ' . $loop . ',
-                    playlist: "' . $video['videoId'] . '",
-                  },
-                });
-              }
-            </script>';
-
-        return $this->render('home/nextCode.html.twig', [
-            'video' => $video,
-            'iframe' => $iframe,
-            'embedcode' => $embedCode
-
-        ]);
+        return $this->redirectToRoute('login');
     }
 }

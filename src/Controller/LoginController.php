@@ -6,7 +6,6 @@ use Google_Client;
 use App\Entity\AccessToken;
 use Google\Service\YouTube as Google_Service_YouTube;
 use Google_Service_Exception;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,51 +18,75 @@ class LoginController extends AbstractController
      * @Route("/login", name="login")
      */
 
-    public function login(EntityManagerInterface $entityManager)
-    {
-        $accessTokenRepository = $entityManager->getRepository(AccessToken::class);
-        $accessToken = $accessTokenRepository->findOneBy([], ['id' => 'DESC']);
-    
-        if ($accessToken) {
-            return $this->redirectToRoute('home');
-        }
-    
+     public function login(Request $request)
+     {
+         $session = $request->getSession();
+         $access_token = $session->get('access_token');
+ 
+         if ($access_token) {
+             return $this->redirectToRoute('home');
+         }
     
         return $this->render('first_login.html.twig');
     }
-
     /**
      * @Route("/login_with_google", name="login_with_google")
      */
 
-    public function loginWithGoogle(Request $request)
-    {
-        $client = new Google_Client();
-        $client->setClientId('1041883215956-c527f1l8illo7bnfdk3fjqvdthjdvill.apps.googleusercontent.com');
-        $client->setClientSecret('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');
-        $client->setRedirectUri($this->generateUrl('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL));
-        $client->addScope(Google_Service_YouTube::YOUTUBE_READONLY);
-
-        
-        $authUrl = $client->createAuthUrl();
-        return $this->redirect($authUrl);
-    }
+     public function loginWithGoogle(Request $request)
+     {
+         $client = new Google_Client();
+         $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
+         $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
+         $client->setRedirectUri($this->generateUrl('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL));
+         $client->addScope(Google_Service_YouTube::YOUTUBE_READONLY);
+         
+         
+         $authUrl = $client->createAuthUrl();
+         return $this->redirect($authUrl);
+     }
 
     /**
      * @Route("/login_callback", name="login_callback")
      */
-    public function loginCallback(Request $request, EntityManagerInterface $entityManager)
+    public function loginCallback(Request $request)
     {
         
         $client = new Google_Client();
-        $client->setClientId('1041883215956-c527f1l8illo7bnfdk3fjqvdthjdvill.apps.googleusercontent.com');
-        $client->setClientSecret('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');
+        $client->setClientId($_ENV['GOOGLE_CLIENT_ID']);
+         $client->setClientSecret($_ENV['GOOGLE_CLIENT_SECRET']);
         $client->setRedirectUri($this->generateUrl('login_callback', [], UrlGeneratorInterface::ABSOLUTE_URL));
         $client->addScope(Google_Service_YouTube::YOUTUBE_READONLY);
 
-        $code = $request->query->get('code');
-        $accessToken = $client->fetchAccessTokenWithAuthCode($code);
-        $client->setAccessToken($accessToken);
+        $session = $request->getSession();
+
+        if ($session->has('access_token')) {
+            $client->setAccessToken($session->get('access_token'));
+        } else {
+            $code = $request->query->get('code');
+            $accessToken = $client->fetchAccessTokenWithAuthCode($code);
+            
+            $client->setAccessToken($accessToken);
+
+            // Store access token in session
+            $session->set('access_token', $accessToken);
+        }
+    
+        // Check if access token has expired
+        if ($client->isAccessTokenExpired()) {
+            // Refresh the access token
+            $refreshToken = $client->getRefreshToken();
+            $client->fetchAccessTokenWithRefreshToken($refreshToken);
+    
+            // Update the access token in session
+            $session->set('access_token', $client->getAccessToken());
+
+            // Set expiration time to 1 minute
+            $accessToken = $client->getAccessToken();
+            $accessToken['expires_in'] = 60;
+            $client->setAccessToken($accessToken);
+            $session->set('access_token', $accessToken);
+        }
 
         try {
             $youtube = new Google_Service_YouTube($client);
@@ -80,15 +103,6 @@ class LoginController extends AbstractController
                 'message' => $e->getMessage()
             ]);
         }
-        
-
-            // Store the access token in the database
-        $AccessToken = new AccessToken();
-        $AccessToken->setToken(json_encode($accessToken));
-        $entityManager->persist($AccessToken);
-        $entityManager->flush();
-
-
         return $this->redirectToRoute('home');
     }
 }

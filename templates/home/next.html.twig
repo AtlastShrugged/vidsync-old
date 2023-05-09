@@ -1,6 +1,9 @@
 {% extends 'base.html.twig' %}
 {% block title %}Video Details
 {% endblock %}
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/home.css') }}" /> 
+{% endblock %}
 {% block body %}
 	<div class="video-container">
 		<div class="video-player">
@@ -24,6 +27,7 @@
         <label for="textbox2"><h3><input type="text" class="textara" id="textbox2" name="textbox2"> Height of video</h3></label>
         
     </div>
+    <a class="next-btn1" href="{{ path('signout') }}">Sign Out</a>
     <button id="next-btn" class="next-btn">Next</button>
 </form>
 		</div>
@@ -70,6 +74,28 @@
 			flex: 1;
 			padding: 100px 80px;
 		}
+    .next-btn1 {
+    display: block;
+    position: absolute;
+    top: 20px;
+    right: 120px;
+    padding: 10px 10px;
+    background-color: #da2013;
+    color: #fff;
+	  text-decoration:none;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .next-btn1:hover {
+    background-color: #d4281b;
+  }
+
 	</style>
 
 {% endblock %}
