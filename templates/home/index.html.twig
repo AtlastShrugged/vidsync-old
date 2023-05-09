@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Videos
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/home.css') }}" /> 
+{% endblock %}
+
+{% block body %}
+<body>
+	<button id="next-btn" class="next-btn">Next</button>
+	<a class="next-btn1" href="{{ path('signout') }}">Sign Out</a>
+	<form method="get" action="{{ path('home') }}" class="mb-4 search">
+		<div class="search-container">
+			<div>
+				<input id="search-input" type="text" name="keyword"  placeholder="Search" value="{{ keyword }}"/>
+			</div>
+			<div class="select">
+			<label>Show&nbsp;</label><select name="limit" id="limit-select">
+				{% for i in 1..videos|length %}
+					<option value="{{ i }}" {{ limit == i ? 'selected' : '' }}>{{ i }}
+						</option>
+				{% endfor %}
+			</select><label>&nbsp;Rows</label>
+			</div>
+		</div>
+	</form>
+	
+	{% if noResults %}
+		<p>No results found: "{{keyword}}"</p>
+
+	{% else %}
+		{% set totalPages = (videos|length / limit)|round(0, 'ceil') %}
+		{% set currentPage = app.request.query.get('page', 1) %}
+		{% set start = (currentPage - 1) * limit %}
+		{% set end = start + limit %}
+		<div class="video-list">
+			<div class="video-heading">
+				<div class="video-heading-col">Video</div>
+				<div class="video-heading-col">Name</div>
+				<div class="video-heading-col">Published Date</div>
+				<div class="video-heading-col">ID</div>
+				<div class="video-heading-col">Duration</div>
+			</div>
+		{% for video in videos|slice(start, end) %}
+			{% if loop.index <= limit %}
+				<div class="video">
+							<div class="video-col">
+								<input type="radio" class="round" name="selectedVideo" value="{{ video.videoId }}"/>
+								<img src="{{ video.thumbnail }}" alt="{{ video.title }}"/>
+							</div>
+							<div class="video-col">
+								<h6>{{ video.title }}</h6>
+							</div>
+							<div class="video-col">
+								<p>{{ video.publishedAt|date('Y-m-d') }}</p>
+							</div>
+							<div class="video-col">
+								<p>{{ video.videoId }}</p>
+							</div>
+							<div class="video-col">
+								<p>{{ video.duration }}</p>
+							</div>
+				</div>
+			{% endif %}
+		{% endfor %}
+		<div class="pagination">
+			{% if currentPage > 1 %}
+				<a href="{{ path('home', {'limit': limit, 'page': currentPage - 1}) }}">&#x3c;</a>
+			{% endif %}
+			{% for page in 1..totalPages %}
+				{% if page == currentPage %}
+					<span class="current">{{ page }}</span>
+				{% else %}
+					<a href="{{ path('home', {'limit': limit, 'page': page}) }}">{{ page }}</a>
+				{% endif %}
+			{% endfor %}
+			{% if currentPage < totalPages %}
+				<a href="{{ path('home', {'limit': limit, 'page': currentPage + 1}) }}">&#62;</a>
+			{% endif %}
+		</div>
+		<style>
+		body {
+  font-family: Arial, sans-serif;
+}
+.next-btn1 {
+    display: block;
+    position: absolute;
+    top: 20px;
+    right: 120px;
+    padding: 10px 10px;
+    background-color: #da2013;
+    color: #fff;
+	  text-decoration:none;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .next-btn1:hover {
+    background-color: #d4281b;
+  }
+.round{
+	position:relative;
+	top:-35px;
+	left:-2px;
+}
+		</style>
+		<script>
+			const nextBtn = document.getElementById('next-btn');
+nextBtn.addEventListener('click', () => {
+const selectedVideoId = document.querySelector('input[name="selectedVideo"]:checked').value;
+window.location.href = "{{ path('video_detail', {'videoId': 'VIDEO_ID'}) }}".replace('VIDEO_ID', selectedVideoId);
+});
+
+document.getElementById('limit-select').addEventListener('change', function () {
+this.form.submit();
+});
+		</script>
+	{% endif %}
+</body>
+{% endblock %}
+

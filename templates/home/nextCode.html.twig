@@ -1,0 +1,78 @@
+{% extends 'base.html.twig' %}
+{% block title %}Video Codes
+{% endblock %}
+{% block body %}
+<a class="next-btn1" href="{{ path('signout') }}">Sign Out</a>
+	<div class="video-container">
+		<div class="video-player">
+			<h1>{{ video.title }}</h1>
+			<iframe src="https://www.youtube.com/embed/{{ video.videoId }}" frameborder="0" allowfullscreen width="570" height="308"></iframe>
+		</div>
+
+		<div class="video-details">
+			<div
+				class="video-iframe">
+				{# <h4>Iframe:</h4> #}
+				Iframe:
+				<br>
+				<br>
+				{{ iframe }}
+			</div>
+			<div
+				class="video-embed">
+				{# <h4>Embed Code:</h4> #}
+				Embed Code:
+				<br>
+				<br>
+				{{ embedcode }}
+			</div>
+		</div>
+	</div>
+	<style>
+	body {
+  font-family: Arial, sans-serif;
+}
+		.video-container {
+			display: flex;
+			flex-direction: row;
+		}
+
+		.video-player {
+			flex: 1;
+			padding: 0 50px;
+		}
+
+		.video-details {
+			flex: 1;
+			padding: 75px 50px;
+		}
+
+		.video-iframe,
+		.video-embed {
+			border: 1px solid #ccc;
+			padding: 10px;
+		}
+		.next-btn1 {
+    display: block;
+    position: absolute;
+    top: 20px;
+    right: 120px;
+    padding: 10px 10px;
+    background-color: #da2013;
+    color: #fff;
+	  text-decoration:none;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    border: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .next-btn1:hover {
+    background-color: #d4281b;
+  }
+	</style>
+{% endblock %}  
+
